@@ -1,0 +1,85 @@
+name: 🔍 Debug Keyword Detection
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  debug-keywords:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Debug Event Data
+        run: |
+          echo "🔍 Event Type: ${{ github.event_name }}"
+          echo "🔍 Action: ${{ github.event.action }}"
+          echo "🔍 Actor: ${{ github.actor }}"
+          echo "🔍 Repository: ${{ github.repository }}"
+          
+      - name: 🔍 Debug Issue Content
+        if: github.event_name == 'issues'
+        run: |
+          echo "📝 Issue Title: ${{ github.event.issue.title }}"
+          echo "📝 Issue Body:"
+          echo "${{ github.event.issue.body }}"
+          echo "🔍 Contains [claude-ai]: ${{ contains(github.event.issue.body, '[claude-ai]') }}"
+          echo "🔍 Contains claude-help: ${{ contains(github.event.issue.body, 'claude-help') }}"
+          
+      - name: 🔍 Debug Comment Content  
+        if: github.event_name == 'issue_comment'
+        run: |
+          echo "💬 Comment Body:"
+          echo "${{ github.event.comment.body }}"
+          echo "🔍 Contains [claude-ai]: ${{ contains(github.event.comment.body, '[claude-ai]') }}"
+          echo "🔍 Contains claude-help: ${{ contains(github.event.comment.body, 'claude-help') }}"
+          
+      - name: 🎯 Keyword Detection Result
+        if: contains(github.event.comment.body, '[claude-ai]') || contains(github.event.issue.body, '[claude-ai]') || contains(github.event.comment.body, 'claude-help') || contains(github.event.issue.body, 'claude-help')
+        run: |
+          echo "✅ キーワード検出成功！"
+          echo "🚀 MAXプラン統合処理を実行します"
+          
+      - name: 📝 Debug Response
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueBody = context.payload.issue?.body || '';
+            const commentBody = context.payload.comment?.body || '';
+            
+            const hasClaudeAI = issueBody.includes('[claude-ai]') || commentBody.includes('[claude-ai]');
+            const hasClaudeHelp = issueBody.includes('claude-help') || commentBody.includes('claude-help');
+            
+            const comment = `🔍 **キーワード検出デバッグ結果**
+            
+            **Event**: ${context.eventName}
+            **Action**: ${context.payload.action}
+            **Time**: ${new Date().toISOString()}
+            
+            **検出結果**:
+            - 🔍 \`[claude-ai]\` 検出: ${hasClaudeAI ? '✅ YES' : '❌ NO'}
+            - 🔍 \`claude-help\` 検出: ${hasClaudeHelp ? '✅ YES' : '❌ NO'}
+            
+            **Content**:
+            \`\`\`
+            Issue Body: ${issueBody.substring(0, 200)}...
+            Comment Body: ${commentBody.substring(0, 200)}...
+            \`\`\`
+            
+            ${hasClaudeAI || hasClaudeHelp ? '🚀 **キーワード検出成功！MAXプラン統合処理実行中...**' : '⚠️ **キーワードが検出されませんでした**'}`;
+            
+            if (context.eventName === 'issues') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            } else if (context.eventName === 'issue_comment') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            } 

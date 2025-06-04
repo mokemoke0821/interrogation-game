@@ -1,0 +1,58 @@
+name: 🧪 Basic GitHub Actions Test
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  basic-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ Basic Test
+        run: |
+          echo "🎯 GitHub Actions 基本動作テスト開始"
+          echo "Event: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "✅ GitHub Actions 正常動作確認完了"
+          
+      - name: 📝 Test Comment Response
+        if: github.event_name == 'issues' || github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const comment = `🧪 **GitHub Actions基本動作テスト完了**
+            
+            **実行情報**:
+            - Event: ${{ github.event_name }}
+            - Repository: ${{ github.repository }}
+            - Time: ${new Date().toISOString()}
+            
+            ✅ **GitHub Actions正常動作中**
+            
+            次はキーワードトリガーテストを実行してください：
+            \`\`\`
+            [claude-ai] テスト実行
+            \`\`\``;
+            
+            if (context.eventName === 'issues') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            } else if (context.eventName === 'issue_comment') {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            } 
