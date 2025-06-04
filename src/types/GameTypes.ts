@@ -1,26 +1,26 @@
 // ===== ゲームコア型定義 =====
 
 export enum QuestionType {
-  DIRECT_ATTACK = 25,     // 直接的な糾弾
-  PSYCHOLOGICAL = 20,     // 心理的圧迫
-  LOGICAL = 15,           // 論理的追求
-  EMOTIONAL = 18,         // 感情的訴求
-  EVIDENCE = 30,          // 証拠提示
-  GENTLE = 5              // 優しい質問
+  DIRECT_ATTACK = 25, // 直接的な糾弾
+  PSYCHOLOGICAL = 20, // 心理的圧迫
+  LOGICAL = 15, // 論理的追求
+  EMOTIONAL = 18, // 感情的訴求
+  EVIDENCE = 30, // 証拠提示
+  GENTLE = 5, // 優しい質問
 }
 
 export interface SuspectStatus {
-  mentalLife: number;        // 0-100% 心理的耐久力
-  alertLevel: number;        // 0-100% 警戒度
-  trustLevel: number;        // 0-100% 刑事への信頼度
-  confessionRate: number;    // 0-100% 自供意欲
+  mentalLife: number; // 0-100% 心理的耐久力
+  alertLevel: number; // 0-100% 警戒度
+  trustLevel: number; // 0-100% 刑事への信頼度
+  confessionRate: number; // 0-100% 自供意欲
 }
 
 export enum GamePhase {
-  PHASE1_CONFIDENT = 1,    // 余裕期 (100-70%)
-  PHASE2_NERVOUS = 2,      // 動揺期 (69-40%)
-  PHASE3_CONFUSED = 3,     // 混乱期 (39-20%)
-  PHASE4_BREAKDOWN = 4     // 崩壊期 (20-0%)
+  PHASE1_CONFIDENT = 1, // 余裕期 (100-70%)
+  PHASE2_NERVOUS = 2, // 動揺期 (69-40%)
+  PHASE3_CONFUSED = 3, // 混乱期 (39-20%)
+  PHASE4_BREAKDOWN = 4, // 崩壊期 (20-0%)
 }
 
 export interface PersonalityPhase {
@@ -72,14 +72,14 @@ export interface DamageResult {
 export interface GameTurn {
   turnNumber: number;
   phase: 'PLAYER_QUESTION' | 'AI_RESPONSE' | 'STATUS_UPDATE' | 'SPECIAL_EVENT';
-  
+
   playerAction?: {
     questionText: string;
     detectedType: QuestionType;
     skillUsed?: DetectiveSkill;
     timestamp: number;
   };
-  
+
   aiResponse?: {
     responseText: string;
     damageDealt: number;
@@ -87,7 +87,7 @@ export interface GameTurn {
     specialAction?: CounterAttack;
     emotion?: string;
   };
-  
+
   gameState: {
     turnNumber: number;
     timeRemaining: number;
@@ -104,11 +104,11 @@ export interface GameLog {
 }
 
 export enum GameResult {
-  PERFECT_VICTORY = 'PERFECT_VICTORY',  // 15ターン以内
-  VICTORY = 'VICTORY',                  // 30ターン以内
-  DRAW = 'DRAW',                        // 時間切れ (Life 20-40%)
-  DEFEAT = 'DEFEAT',                    // 時間切れ or 弁護士
-  SURRENDER = 'SURRENDER'               // プレイヤー降参
+  PERFECT_VICTORY = 'PERFECT_VICTORY', // 15ターン以内
+  VICTORY = 'VICTORY', // 30ターン以内
+  DRAW = 'DRAW', // 時間切れ (Life 20-40%)
+  DEFEAT = 'DEFEAT', // 時間切れ or 弁護士
+  SURRENDER = 'SURRENDER', // プレイヤー降参
 }
 
 // ===== AI犯人型定義 =====
@@ -153,7 +153,14 @@ export interface DifficultyModifiers {
 // ===== UIイベント型定義 =====
 
 export interface GameEvent {
-  type: 'DAMAGE' | 'HEAL' | 'STATUS_CHANGE' | 'PHASE_CHANGE' | 'SKILL_USE' | 'COUNTER' | 'SPECIAL';
+  type:
+    | 'DAMAGE'
+    | 'HEAL'
+    | 'STATUS_CHANGE'
+    | 'PHASE_CHANGE'
+    | 'SKILL_USE'
+    | 'COUNTER'
+    | 'SPECIAL';
   data: any;
 }
 
@@ -208,26 +215,26 @@ export interface GameStore {
   gameActive: boolean;
   currentTurn: number;
   maxTurns: number;
-  
+
   // 犯人情報
   suspect: SuspectBackground | null;
   suspectStatus: SuspectStatus;
   currentPhase: GamePhase;
-  
+
   // プレイヤー情報
   interrogationPoints: number;
   availableSkills: DetectiveSkill[];
-  
+
   // ゲームログ
   logs: GameLog[];
   conversationHistory: GameContext['conversationHistory'];
-  
+
   // アクション
   startGame: (settings: GameSettings) => void;
   askQuestion: (question: string) => Promise<void>;
   useSkill: (skillId: string) => void;
   endGame: (result: GameResult) => void;
-  
+
   // UI状態
   isProcessing: boolean;
   currentAnimation: AnimationEffect | null;

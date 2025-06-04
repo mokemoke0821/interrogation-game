@@ -1,12 +1,12 @@
 import { OllamaClient } from '../ollama/OllamaClient';
 import { PersonalityManager } from './PersonalityManager';
-import { 
-  SuspectBackground, 
-  SuspectStatus, 
+import {
+  SuspectBackground,
+  SuspectStatus,
   GamePhase,
   GameContext,
   QuestionType,
-  SuspectSpecialAction
+  SuspectSpecialAction,
 } from '../types/GameTypes';
 
 export class SuspectAI {
@@ -25,7 +25,9 @@ export class SuspectAI {
     this.ollamaClient = new OllamaClient(ollamaModel);
     this.conversationHistory = [];
     this.secretsRevealed = [];
-    this.specialActions = PersonalityManager.generateSpecialActions(this.background);
+    this.specialActions = PersonalityManager.generateSpecialActions(
+      this.background
+    );
   }
 
   /**
@@ -40,7 +42,7 @@ export class SuspectAI {
       '家族を守るため',
       '復讐のため',
       '金銭的な困窮',
-      '衝動的な行動'
+      '衝動的な行動',
     ];
     const personalities = ['冷静', '感情的', '頑固', '狡猾', '臆病'];
     const weaknesses = [
@@ -48,18 +50,22 @@ export class SuspectAI {
       '罪悪感',
       '証拠の存在',
       '共犯者の裏切り',
-      '過去のトラウマ'
+      '過去のトラウマ',
     ];
 
     const suspect: SuspectBackground = {
       name: names[Math.floor(Math.random() * names.length)] || '名無し',
       age: 25 + Math.floor(Math.random() * 30),
-      occupation: occupations[Math.floor(Math.random() * occupations.length)] || '無職',
+      occupation:
+        occupations[Math.floor(Math.random() * occupations.length)] || '無職',
       crime: crimes[Math.floor(Math.random() * crimes.length)] || '不明',
       motive: motives[Math.floor(Math.random() * motives.length)] || '不明',
-      personality: personalities[Math.floor(Math.random() * personalities.length)] || '冷静',
-      secretWeakness: weaknesses[Math.floor(Math.random() * weaknesses.length)] || '不明',
-      hiddenTruths: this.generateHiddenTruths()
+      personality:
+        personalities[Math.floor(Math.random() * personalities.length)] ||
+        '冷静',
+      secretWeakness:
+        weaknesses[Math.floor(Math.random() * weaknesses.length)] || '不明',
+      hiddenTruths: this.generateHiddenTruths(),
     };
 
     return suspect;
@@ -74,8 +80,10 @@ export class SuspectAI {
       '共犯者がいる',
       '証拠を隠している場所がある',
       '本当の動機は別にある',
-      '被害者との関係を隠している'
-    ].sort(() => Math.random() - 0.5).slice(0, 3);
+      '被害者との関係を隠している',
+    ]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
   }
 
   /**
@@ -86,7 +94,7 @@ export class SuspectAI {
       mentalLife: 100,
       alertLevel: 10,
       trustLevel: 20,
-      confessionRate: 0
+      confessionRate: 0,
     };
   }
 
@@ -108,12 +116,12 @@ export class SuspectAI {
   }> {
     // 質問タイプ検出
     const questionType = this.ollamaClient.detectQuestionType(playerQuestion);
-    
+
     // 会話履歴に追加
     this.conversationHistory.push({
       role: 'player',
       message: playerQuestion,
-      questionType
+      questionType,
     });
 
     // ゲームコンテキスト作成
@@ -123,7 +131,7 @@ export class SuspectAI {
       currentPhase: this.currentPhase,
       conversationHistory: this.conversationHistory,
       turnNumber: this.conversationHistory.length,
-      secretsRevealed: this.secretsRevealed
+      secretsRevealed: this.secretsRevealed,
     };
 
     // AI応答生成
@@ -134,9 +142,16 @@ export class SuspectAI {
     );
 
     // 真実の漏洩チェック
-    if (PersonalityManager.shouldRevealTruth(this.currentPhase, this.status.mentalLife)) {
+    if (
+      PersonalityManager.shouldRevealTruth(
+        this.currentPhase,
+        this.status.mentalLife
+      )
+    ) {
       const partialTruth = PersonalityManager.generatePartialTruth(
-        this.background.hiddenTruths.filter(t => !this.secretsRevealed.includes(t))
+        this.background.hiddenTruths.filter(
+          t => !this.secretsRevealed.includes(t)
+        )
       );
       if (partialTruth) {
         response += ` ${partialTruth}`;
@@ -144,17 +159,26 @@ export class SuspectAI {
     }
 
     // 自供モードチェック
-    if (this.currentPhase === GamePhase.PHASE4_BREAKDOWN && this.status.confessionRate > 80) {
+    if (
+      this.currentPhase === GamePhase.PHASE4_BREAKDOWN &&
+      this.status.confessionRate > 80
+    ) {
       if (Math.random() < 0.3) {
         response = PersonalityManager.generateConfessionLine(this.background);
       }
     }
 
     // 感情生成
-    const emotion = PersonalityManager.generateEmotion(this.currentPhase, this.status.mentalLife);
+    const emotion = PersonalityManager.generateEmotion(
+      this.currentPhase,
+      this.status.mentalLife
+    );
 
     // 内部思考（デバッグ/演出用）
-    const innerThought = PersonalityManager.generateInnerThought(this.currentPhase, this.status);
+    const innerThought = PersonalityManager.generateInnerThought(
+      this.currentPhase,
+      this.status
+    );
 
     // 特殊アクション判定
     const specialAction = this.checkSpecialAction();
@@ -162,14 +186,14 @@ export class SuspectAI {
     // 会話履歴に追加
     this.conversationHistory.push({
       role: 'suspect',
-      message: response
+      message: response,
     });
 
     return {
       response,
       emotion,
       innerThought,
-      specialAction
+      specialAction,
     };
   }
 
@@ -214,7 +238,7 @@ export class SuspectAI {
   updateStatus(changes: Partial<SuspectStatus>): void {
     this.status = {
       ...this.status,
-      ...changes
+      ...changes,
     };
 
     // フェーズ更新チェック
@@ -241,9 +265,9 @@ export class SuspectAI {
     const unrevealed = this.background.hiddenTruths.filter(
       t => !this.secretsRevealed.includes(t)
     );
-    
+
     if (unrevealed.length === 0) return null;
-    
+
     const secret = unrevealed[Math.floor(Math.random() * unrevealed.length)];
     if (secret) {
       this.secretsRevealed.push(secret);
@@ -283,7 +307,9 @@ export class SuspectAI {
     this.currentPhase = GamePhase.PHASE1_CONFIDENT;
     this.conversationHistory = [];
     this.secretsRevealed = [];
-    this.specialActions = PersonalityManager.generateSpecialActions(this.background);
+    this.specialActions = PersonalityManager.generateSpecialActions(
+      this.background
+    );
     this.ollamaClient.resetContext();
   }
 }

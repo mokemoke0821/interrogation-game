@@ -1,5 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
-import { GameContext, OllamaRequest, OllamaResponse, QuestionType } from '../types/GameTypes';
+import {
+  GameContext,
+  OllamaRequest,
+  OllamaResponse,
+  QuestionType,
+} from '../types/GameTypes';
 
 export class OllamaClient {
   private client: AxiosInstance;
@@ -25,8 +30,10 @@ export class OllamaClient {
 
     // 🎯 複雑性削減: 各パターンを個別メソッドに分離
     if (this.isEvidencePattern(lowerQuestion)) return QuestionType.EVIDENCE;
-    if (this.isDirectAttackPattern(lowerQuestion)) return QuestionType.DIRECT_ATTACK;
-    if (this.isPsychologicalPattern(lowerQuestion)) return QuestionType.PSYCHOLOGICAL;
+    if (this.isDirectAttackPattern(lowerQuestion))
+      return QuestionType.DIRECT_ATTACK;
+    if (this.isPsychologicalPattern(lowerQuestion))
+      return QuestionType.PSYCHOLOGICAL;
     if (this.isEmotionalPattern(lowerQuestion)) return QuestionType.EMOTIONAL;
     if (this.isLogicalPattern(lowerQuestion)) return QuestionType.LOGICAL;
     if (this.isGentlePattern(lowerQuestion)) return QuestionType.GENTLE;
@@ -35,33 +42,57 @@ export class OllamaClient {
   }
 
   private isEvidencePattern(question: string): boolean {
-    return question.includes('証拠') || question.includes('これを見て') ||
-      question.includes('記録') || question.includes('データ');
+    return (
+      question.includes('証拠') ||
+      question.includes('これを見て') ||
+      question.includes('記録') ||
+      question.includes('データ')
+    );
   }
 
   private isDirectAttackPattern(question: string): boolean {
-    return question.includes('やったのは') || question.includes('犯人は') ||
-      question.includes('お前が') || question.includes('あなたが');
+    return (
+      question.includes('やったのは') ||
+      question.includes('犯人は') ||
+      question.includes('お前が') ||
+      question.includes('あなたが')
+    );
   }
 
   private isPsychologicalPattern(question: string): boolean {
-    return question.includes('被害者') || question.includes('苦しみ') ||
-      question.includes('どう思う') || question.includes('気持ち');
+    return (
+      question.includes('被害者') ||
+      question.includes('苦しみ') ||
+      question.includes('どう思う') ||
+      question.includes('気持ち')
+    );
   }
 
   private isEmotionalPattern(question: string): boolean {
-    return question.includes('家族') || question.includes('愛する') ||
-      question.includes('未来') || question.includes('後悔');
+    return (
+      question.includes('家族') ||
+      question.includes('愛する') ||
+      question.includes('未来') ||
+      question.includes('後悔')
+    );
   }
 
   private isLogicalPattern(question: string): boolean {
-    return question.includes('矛盾') || question.includes('説明') ||
-      question.includes('なぜ') || question.includes('理由');
+    return (
+      question.includes('矛盾') ||
+      question.includes('説明') ||
+      question.includes('なぜ') ||
+      question.includes('理由')
+    );
   }
 
   private isGentlePattern(question: string): boolean {
-    return question.includes('大丈夫') || question.includes('休憩') ||
-      question.includes('水') || question.includes('体調');
+    return (
+      question.includes('大丈夫') ||
+      question.includes('休憩') ||
+      question.includes('水') ||
+      question.includes('体調')
+    );
   }
 
   /**
@@ -73,7 +104,11 @@ export class OllamaClient {
     questionType: QuestionType
   ): Promise<string> {
     try {
-      const prompt = this.buildPrompt(gameContext, playerQuestion, questionType);
+      const prompt = this.buildPrompt(
+        gameContext,
+        playerQuestion,
+        questionType
+      );
 
       const request: OllamaRequest = {
         model: this.model,
@@ -87,7 +122,10 @@ export class OllamaClient {
         },
       };
 
-      const response = await this.client.post<OllamaResponse>('/api/generate', request);
+      const response = await this.client.post<OllamaResponse>(
+        '/api/generate',
+        request
+      );
 
       if (response.data.context) {
         this.context = response.data.context;
@@ -96,7 +134,8 @@ export class OllamaClient {
       return response.data.response.trim();
     } catch (error) {
       // 🔒 セキュリティリスク除去: エラー詳細を隠蔽
-      const errorMessage = error instanceof Error ? error.message : 'API接続エラー';
+      const errorMessage =
+        error instanceof Error ? error.message : 'API接続エラー';
 
       // 開発環境でのみデバッグ情報を出力
       if (process.env.NODE_ENV === 'development') {
@@ -116,7 +155,8 @@ export class OllamaClient {
     playerQuestion: string,
     questionType: QuestionType
   ): string {
-    const { suspect, currentStatus, currentPhase, conversationHistory } = gameContext;
+    const { suspect, currentStatus, currentPhase, conversationHistory } =
+      gameContext;
 
     // 基本的な犯人設定
     let prompt = `あなたは${suspect.name}という${suspect.age}歳の${suspect.occupation}です。
@@ -199,35 +239,35 @@ ${suspect.crime}の容疑で取り調べを受けています。
   private getFallbackResponse(phase: number): string {
     const responses: Record<number, string[]> = {
       1: [
-        "私は何も知りません。",
-        "証拠があるなら見せてください。",
-        "弁護士を呼びたいです。",
-        "なぜ私が疑われるんですか？"
+        '私は何も知りません。',
+        '証拠があるなら見せてください。',
+        '弁護士を呼びたいです。',
+        'なぜ私が疑われるんですか？',
       ],
       2: [
-        "...そんなことは...",
-        "ちょっと待ってください、それは...",
-        "記憶が...はっきりしません。",
-        "なぜそんなことを聞くんですか！"
+        '...そんなことは...',
+        'ちょっと待ってください、それは...',
+        '記憶が...はっきりしません。',
+        'なぜそんなことを聞くんですか！',
       ],
       3: [
-        "わからない...わからないんです！",
-        "やめて...もう...",
-        "本当に...でも私は...",
-        "どうすればいいんですか..."
+        'わからない...わからないんです！',
+        'やめて...もう...',
+        '本当に...でも私は...',
+        'どうすればいいんですか...',
       ],
       4: [
-        "もう...無理です...",
-        "すみません...本当に...",
-        "...認めます...",
-        "助けてください..."
-      ]
+        'もう...無理です...',
+        'すみません...本当に...',
+        '...認めます...',
+        '助けてください...',
+      ],
     };
 
     // 🔒 型安全性確保: 明示的なフォールバック処理
     const defaultResponses = [
-      "私は何も知りません。",
-      "証拠があるなら見せてください。"
+      '私は何も知りません。',
+      '証拠があるなら見せてください。',
     ];
 
     const phaseResponses = responses[phase] || defaultResponses;

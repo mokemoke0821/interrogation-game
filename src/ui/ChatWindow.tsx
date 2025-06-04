@@ -14,7 +14,10 @@ const ChatWindow: React.FC = () => {
     scrollToBottom();
   }, [conversationHistory, logs]);
 
-  const renderMessage = (entry: { role: 'player' | 'suspect'; message: string }, index: number) => {
+  const renderMessage = (
+    entry: { role: 'player' | 'suspect'; message: string },
+    index: number
+  ) => {
     const isPlayer = entry.role === 'player';
 
     return (
@@ -26,14 +29,15 @@ const ChatWindow: React.FC = () => {
         className={`flex ${isPlayer ? 'justify-end' : 'justify-start'} mb-4`}
       >
         <div className={`max-w-[70%] ${isPlayer ? 'order-2' : 'order-1'}`}>
-          <div className={`px-4 py-3 rounded-lg ${isPlayer
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-700 text-gray-100'
-            }`}>
-            <div className="text-xs text-gray-300 mb-1">
+          <div
+            className={`px-4 py-3 rounded-lg ${
+              isPlayer ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'
+            }`}
+          >
+            <div className='text-xs text-gray-300 mb-1'>
               {isPlayer ? '刑事' : '容疑者'}
             </div>
-            <div className="text-sm leading-relaxed whitespace-pre-wrap">
+            <div className='text-sm leading-relaxed whitespace-pre-wrap'>
               {entry.message}
             </div>
           </div>
@@ -83,7 +87,7 @@ const ChatWindow: React.FC = () => {
         transition={{ duration: 0.3 }}
         className={`mb-2 px-3 py-2 rounded ${bgColor} ${textColor} text-xs`}
       >
-        <span className="mr-2">{icon}</span>
+        <span className='mr-2'>{icon}</span>
         {log.message}
       </motion.div>
     );
@@ -99,52 +103,60 @@ const ChatWindow: React.FC = () => {
 
     // 関連するログを挿入
     while (logIndex < logs.length && logIndex <= index * 2) {
-      combinedContent.push({ type: 'log', data: logs[logIndex], index: logIndex });
+      combinedContent.push({
+        type: 'log',
+        data: logs[logIndex],
+        index: logIndex,
+      });
       logIndex++;
     }
   });
 
   // 残りのログを追加
   while (logIndex < logs.length) {
-    combinedContent.push({ type: 'log', data: logs[logIndex], index: logIndex });
+    combinedContent.push({
+      type: 'log',
+      data: logs[logIndex],
+      index: logIndex,
+    });
     logIndex++;
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6 h-full flex flex-col border border-gray-700">
-      <h3 className="text-lg font-bold mb-4 text-gray-300">尋問記録</h3>
+    <div className='bg-gray-800 rounded-lg p-6 h-full flex flex-col border border-gray-700'>
+      <h3 className='text-lg font-bold mb-4 text-gray-300'>尋問記録</h3>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+      <div className='flex-1 overflow-y-auto custom-scrollbar pr-2'>
         <AnimatePresence>
-          {combinedContent.map((item, _idx) => (
+          {combinedContent.map((item, _idx) =>
             item.type === 'message'
               ? renderMessage(item.data as any, item.index)
               : renderLog(item.data, item.index)
-          ))}
+          )}
         </AnimatePresence>
 
         {isProcessing && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex justify-start mb-4"
+            className='flex justify-start mb-4'
           >
-            <div className="bg-gray-700 px-4 py-3 rounded-lg">
-              <div className="flex space-x-2">
+            <div className='bg-gray-700 px-4 py-3 rounded-lg'>
+              <div className='flex space-x-2'>
                 <motion.div
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  className="w-2 h-2 bg-gray-400 rounded-full"
+                  className='w-2 h-2 bg-gray-400 rounded-full'
                 />
                 <motion.div
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                  className="w-2 h-2 bg-gray-400 rounded-full"
+                  className='w-2 h-2 bg-gray-400 rounded-full'
                 />
                 <motion.div
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                  className="w-2 h-2 bg-gray-400 rounded-full"
+                  className='w-2 h-2 bg-gray-400 rounded-full'
                 />
               </div>
             </div>

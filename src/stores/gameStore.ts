@@ -6,7 +6,7 @@ import {
   GamePhase,
   GameResult,
   GameSettings,
-  GameStore
+  GameStore,
 } from '../types/GameTypes';
 
 interface GameStoreState extends GameStore {
@@ -41,7 +41,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
     mentalLife: 100,
     alertLevel: 10,
     trustLevel: 20,
-    confessionRate: 0
+    confessionRate: 0,
   },
   currentPhase: GamePhase.PHASE1_CONFIDENT,
 
@@ -89,7 +89,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
         set({
           gameResult: event.data.gameResult,
           showResults: true,
-          gameActive: false
+          gameActive: false,
         });
       }
     });
@@ -111,7 +111,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
       logs: gameState.logs,
       showSettings: false,
       showResults: false,
-      gameResult: null
+      gameResult: null,
     });
   },
 
@@ -131,10 +131,13 @@ const useGameStore = create<GameStoreState>((set, get) => ({
       // 会話履歴に追加
       const currentHistory = get().conversationHistory;
       set({
-        conversationHistory: [...currentHistory, {
-          role: 'player',
-          message: question
-        }]
+        conversationHistory: [
+          ...currentHistory,
+          {
+            role: 'player',
+            message: question,
+          },
+        ],
       });
 
       // ゲームエンジンで処理
@@ -151,15 +154,18 @@ const useGameStore = create<GameStoreState>((set, get) => ({
         suspectStatus: suspectInfo.status,
         currentPhase: suspectInfo.phase,
         logs: gameState.logs,
-        conversationHistory: [...get().conversationHistory, {
-          role: 'suspect',
-          message: turn.aiResponse?.responseText || ''
-        }]
+        conversationHistory: [
+          ...get().conversationHistory,
+          {
+            role: 'suspect',
+            message: turn.aiResponse?.responseText || '',
+          },
+        ],
       });
-
     } catch (error) {
       // 🔒 セキュリティリスク除去: 詳細なエラー情報を隠蔽
-      const errorMessage = error instanceof Error ? error.message : '不明なエラー';
+      const errorMessage =
+        error instanceof Error ? error.message : '不明なエラー';
 
       // 開発環境でのみデバッグ情報を出力
       if (process.env.NODE_ENV === 'development') {
@@ -168,10 +174,14 @@ const useGameStore = create<GameStoreState>((set, get) => ({
 
       // ユーザーフレンドリーなエラーメッセージを会話履歴に追加
       set(state => ({
-        conversationHistory: [...state.conversationHistory, {
-          role: 'suspect' as const,
-          message: '（システムエラー：一時的な問題が発生しました。もう一度お試しください。）'
-        }]
+        conversationHistory: [
+          ...state.conversationHistory,
+          {
+            role: 'suspect' as const,
+            message:
+              '（システムエラー：一時的な問題が発生しました。もう一度お試しください。）',
+          },
+        ],
       }));
     } finally {
       set({ isProcessing: false });
@@ -184,12 +194,22 @@ const useGameStore = create<GameStoreState>((set, get) => ({
     if (!gameEngine) return;
 
     const skill = availableSkills.find(s => s.id === skillId);
-    if (!skill || skill.currentUses >= skill.maxUses || skill.currentCooldown > 0) {
+    if (
+      !skill ||
+      skill.currentUses >= skill.maxUses ||
+      skill.currentCooldown > 0
+    ) {
       return;
     }
 
     // スキルIDを保存して次の質問で使用
-    set({ currentAnimation: { type: 'pulse', duration: 1000, color: '#4ade80' } as AnimationEffect });
+    set({
+      currentAnimation: {
+        type: 'pulse',
+        duration: 1000,
+        color: '#4ade80',
+      } as AnimationEffect,
+    });
   },
 
   // ゲーム終了
@@ -197,7 +217,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
     set({
       gameActive: false,
       gameResult: result,
-      showResults: true
+      showResults: true,
     });
   },
 
@@ -212,7 +232,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
         mentalLife: 100,
         alertLevel: 10,
         trustLevel: 20,
-        confessionRate: 0
+        confessionRate: 0,
       },
       currentPhase: GamePhase.PHASE1_CONFIDENT,
       interrogationPoints: 100,
@@ -224,7 +244,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
       damageNumbers: [],
       showSettings: true,
       showResults: false,
-      gameResult: null
+      gameResult: null,
     });
   },
 
@@ -240,7 +260,7 @@ const useGameStore = create<GameStoreState>((set, get) => ({
     const y = 50 + Math.random() * 20 - 10;
 
     set(state => ({
-      damageNumbers: [...state.damageNumbers, { id, value: damage, x, y }]
+      damageNumbers: [...state.damageNumbers, { id, value: damage, x, y }],
     }));
 
     setTimeout(() => {
@@ -251,14 +271,14 @@ const useGameStore = create<GameStoreState>((set, get) => ({
   // ダメージ数値削除
   removeDamageNumber: (id: string) => {
     set(state => ({
-      damageNumbers: state.damageNumbers.filter(d => d.id !== id)
+      damageNumbers: state.damageNumbers.filter(d => d.id !== id),
     }));
   },
 
   // 設定画面トグル
   toggleSettings: () => {
     set(state => ({ showSettings: !state.showSettings }));
-  }
+  },
 }));
 
 export default useGameStore;

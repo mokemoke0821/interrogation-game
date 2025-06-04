@@ -1,26 +1,26 @@
-import '@testing-library/jest-dom'
-import { cleanup } from '@testing-library/react'
-import { afterAll, afterEach, beforeAll, vi } from 'vitest'
+import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 // 🧪 グローバル変数設定
 declare global {
-  var expect: typeof import('vitest').expect
-  var describe: typeof import('vitest').describe
-  var it: typeof import('vitest').it
-  var test: typeof import('vitest').test
-  var vi: typeof import('vitest').vi
-  var beforeEach: typeof import('vitest').beforeEach
-  var afterEach: typeof import('vitest').afterEach
-  var beforeAll: typeof import('vitest').beforeAll
-  var afterAll: typeof import('vitest').afterAll
+  var expect: typeof import('vitest').expect;
+  var describe: typeof import('vitest').describe;
+  var it: typeof import('vitest').it;
+  var test: typeof import('vitest').test;
+  var vi: typeof import('vitest').vi;
+  var beforeEach: typeof import('vitest').beforeEach;
+  var afterEach: typeof import('vitest').afterEach;
+  var beforeAll: typeof import('vitest').beforeAll;
+  var afterAll: typeof import('vitest').afterAll;
 }
 
 // 🧪 テスト後のクリーンアップ
 afterEach(() => {
-  cleanup()
-  vi.clearAllMocks()
-  vi.clearAllTimers()
-})
+  cleanup();
+  vi.clearAllMocks();
+  vi.clearAllTimers();
+});
 
 // 🌐 グローバル設定
 beforeAll(() => {
@@ -38,11 +38,11 @@ beforeAll(() => {
       hash: '',
       assign: vi.fn(),
       replace: vi.fn(),
-      reload: vi.fn()
+      reload: vi.fn(),
     },
     writable: true,
-    configurable: true
-  })
+    configurable: true,
+  });
 
   // 🌐 Navigator API モック
   Object.defineProperty(window, 'navigator', {
@@ -52,11 +52,11 @@ beforeAll(() => {
       languages: ['ja-JP', 'en-US'],
       platform: 'Test',
       cookieEnabled: true,
-      onLine: true
+      onLine: true,
     },
     writable: true,
-    configurable: true
-  })
+    configurable: true,
+  });
 
   // 💾 LocalStorage/SessionStorage モック
   const mockStorage = {
@@ -65,10 +65,10 @@ beforeAll(() => {
     removeItem: vi.fn(),
     clear: vi.fn(),
     length: 0,
-    key: vi.fn()
-  }
-  Object.defineProperty(window, 'localStorage', { value: mockStorage })
-  Object.defineProperty(window, 'sessionStorage', { value: mockStorage })
+    key: vi.fn(),
+  };
+  Object.defineProperty(window, 'localStorage', { value: mockStorage });
+  Object.defineProperty(window, 'sessionStorage', { value: mockStorage });
 
   // 🎨 CSS/Animation API モック
   Object.defineProperty(window, 'getComputedStyle', {
@@ -76,33 +76,33 @@ beforeAll(() => {
       getPropertyValue: () => '',
       display: 'block',
       visibility: 'visible',
-      opacity: '1'
-    })
-  })
+      opacity: '1',
+    }),
+  });
 
   // 📱 Intersection Observer モック
-  global.IntersectionObserver = vi.fn().mockImplementation((callback) => ({
+  global.IntersectionObserver = vi.fn().mockImplementation(callback => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
     root: null,
     rootMargin: '',
-    thresholds: []
-  }))
+    thresholds: [],
+  }));
 
   // 🎯 Resize Observer モック
-  global.ResizeObserver = vi.fn().mockImplementation((callback) => ({
+  global.ResizeObserver = vi.fn().mockImplementation(callback => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
-    disconnect: vi.fn()
-  }))
+    disconnect: vi.fn(),
+  }));
 
   // 🌐 Fetch API モック
-  global.fetch = vi.fn()
+  global.fetch = vi.fn();
 
   // 📊 Console管理（テスト環境での適切なログ制御）
-  const originalError = console.error
-  const originalWarn = console.warn
+  const originalError = console.error;
+  const originalWarn = console.warn;
 
   console.error = (...args: unknown[]) => {
     // React DevToolsやuseEffect関連の警告は無視
@@ -112,10 +112,10 @@ beforeAll(() => {
         args[0].includes('React DevTools') ||
         args[0].includes('validateDOMNesting'))
     ) {
-      return
+      return;
     }
-    originalError.apply(console, args)
-  }
+    originalError.apply(console, args);
+  };
 
   console.warn = (...args: unknown[]) => {
     if (
@@ -123,21 +123,21 @@ beforeAll(() => {
       (args[0].includes('React DevTools') ||
         args[0].includes('componentWillReceiveProps'))
     ) {
-      return
+      return;
     }
-    originalWarn.apply(console, args)
-  }
+    originalWarn.apply(console, args);
+  };
 
   // ⏱️ タイマー設定
-  vi.useFakeTimers()
-})
+  vi.useFakeTimers();
+});
 
 afterAll(() => {
   // 🧹 テスト終了後のリソースクリーンアップ
-  vi.clearAllMocks()
-  vi.clearAllTimers()
-  vi.useRealTimers()
+  vi.clearAllMocks();
+  vi.clearAllTimers();
+  vi.useRealTimers();
 
   // メモリリーク防止
-  cleanup()
-}) 
+  cleanup();
+});

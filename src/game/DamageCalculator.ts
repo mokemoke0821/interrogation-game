@@ -4,7 +4,7 @@ import {
   DetectiveSkill,
   GamePhase,
   QuestionType,
-  SuspectStatus
+  SuspectStatus,
 } from '../types/GameTypes';
 
 export class DamageCalculator {
@@ -42,11 +42,11 @@ export class DamageCalculator {
     // 最終ダメージ計算
     const finalDamage = Math.round(
       baseDamage *
-      lifeMultiplier *
-      trustMultiplier *
-      alertMultiplier *
-      comboMultiplier *
-      criticalMultiplier
+        lifeMultiplier *
+        trustMultiplier *
+        alertMultiplier *
+        comboMultiplier *
+        criticalMultiplier
     );
 
     // 最小ダメージ保証
@@ -61,7 +61,11 @@ export class DamageCalculator {
         alert: alertMultiplier,
       },
       criticalHit,
-      message: this.generateDamageMessage(guaranteedDamage, criticalHit, questionType)
+      message: this.generateDamageMessage(
+        guaranteedDamage,
+        criticalHit,
+        questionType
+      ),
     };
   }
 
@@ -69,31 +73,31 @@ export class DamageCalculator {
    * 精神力による倍率計算
    */
   private static calculateLifeMultiplier(mentalLife: number): number {
-    if (mentalLife < 20) return 2.0;  // 瀕死状態は大ダメージ
-    if (mentalLife < 40) return 1.5;  // 混乱期
-    if (mentalLife < 70) return 1.2;  // 動揺期
-    return 1.0;  // 余裕期
+    if (mentalLife < 20) return 2.0; // 瀕死状態は大ダメージ
+    if (mentalLife < 40) return 1.5; // 混乱期
+    if (mentalLife < 70) return 1.2; // 動揺期
+    return 1.0; // 余裕期
   }
 
   /**
    * 信頼度による倍率計算
    */
   private static calculateTrustMultiplier(trustLevel: number): number {
-    if (trustLevel > 80) return 1.5;   // 高信頼
-    if (trustLevel > 60) return 1.3;   // 中信頼
-    if (trustLevel > 40) return 1.1;   // 低信頼
-    if (trustLevel > 20) return 0.9;   // 不信
-    return 0.7;  // 完全不信
+    if (trustLevel > 80) return 1.5; // 高信頼
+    if (trustLevel > 60) return 1.3; // 中信頼
+    if (trustLevel > 40) return 1.1; // 低信頼
+    if (trustLevel > 20) return 0.9; // 不信
+    return 0.7; // 完全不信
   }
 
   /**
    * 警戒度による倍率計算（防御）
    */
   private static calculateAlertMultiplier(alertLevel: number): number {
-    if (alertLevel > 80) return 0.4;   // 超警戒
-    if (alertLevel > 60) return 0.6;   // 高警戒
-    if (alertLevel > 40) return 0.8;   // 中警戒
-    return 1.0;  // 低警戒
+    if (alertLevel > 80) return 0.4; // 超警戒
+    if (alertLevel > 60) return 0.6; // 高警戒
+    if (alertLevel > 40) return 0.8; // 中警戒
+    return 1.0; // 低警戒
   }
 
   /**
@@ -148,22 +152,34 @@ export class DamageCalculator {
 
       case QuestionType.PSYCHOLOGICAL:
         changes.alertLevel = Math.min(100, currentStatus.alertLevel + 10);
-        changes.confessionRate = Math.min(100, currentStatus.confessionRate + damage * 0.5);
+        changes.confessionRate = Math.min(
+          100,
+          currentStatus.confessionRate + damage * 0.5
+        );
         break;
 
       case QuestionType.LOGICAL:
         changes.alertLevel = Math.min(100, currentStatus.alertLevel + 5);
-        changes.confessionRate = Math.min(100, currentStatus.confessionRate + damage * 0.3);
+        changes.confessionRate = Math.min(
+          100,
+          currentStatus.confessionRate + damage * 0.3
+        );
         break;
 
       case QuestionType.EMOTIONAL:
         changes.trustLevel = Math.min(100, currentStatus.trustLevel + 5);
-        changes.confessionRate = Math.min(100, currentStatus.confessionRate + damage * 0.4);
+        changes.confessionRate = Math.min(
+          100,
+          currentStatus.confessionRate + damage * 0.4
+        );
         break;
 
       case QuestionType.EVIDENCE:
         changes.alertLevel = Math.min(100, currentStatus.alertLevel + 20);
-        changes.confessionRate = Math.min(100, currentStatus.confessionRate + damage * 0.8);
+        changes.confessionRate = Math.min(
+          100,
+          currentStatus.confessionRate + damage * 0.8
+        );
         break;
 
       case QuestionType.GENTLE:
@@ -174,16 +190,27 @@ export class DamageCalculator {
 
     // スキル効果の適用
     if (skill?.id === 'kind_approach') {
-      changes.trustLevel = Math.min(100, (changes.trustLevel || currentStatus.trustLevel) + 30);
-      changes.alertLevel = Math.max(0, (changes.alertLevel || currentStatus.alertLevel) - 20);
+      changes.trustLevel = Math.min(
+        100,
+        (changes.trustLevel || currentStatus.trustLevel) + 30
+      );
+      changes.alertLevel = Math.max(
+        0,
+        (changes.alertLevel || currentStatus.alertLevel) - 20
+      );
     } else if (skill?.id === 'psycho_pressure') {
-      changes.alertLevel = Math.min(100, (changes.alertLevel || currentStatus.alertLevel) + 20);
+      changes.alertLevel = Math.min(
+        100,
+        (changes.alertLevel || currentStatus.alertLevel) + 20
+      );
     }
 
     // 自供率の自然上昇（精神力が低い場合）
     if (changes.mentalLife && changes.mentalLife < 30) {
-      changes.confessionRate = Math.min(100,
-        (changes.confessionRate || currentStatus.confessionRate) + (30 - changes.mentalLife) * 0.5
+      changes.confessionRate = Math.min(
+        100,
+        (changes.confessionRate || currentStatus.confessionRate) +
+          (30 - changes.mentalLife) * 0.5
       );
     }
 
@@ -219,7 +246,8 @@ export class DamageCalculator {
     if (counterTypes.length === 0) {
       return null;
     }
-    const selectedType = counterTypes[Math.floor(Math.random() * counterTypes.length)]!;
+    const selectedType =
+      counterTypes[Math.floor(Math.random() * counterTypes.length)]!;
 
     return this.createCounterAttack(selectedType, currentPhase);
   }
@@ -233,7 +261,10 @@ export class DamageCalculator {
   ): CounterAttack['type'][] {
     const counters: CounterAttack['type'][] = [];
 
-    if (phase === GamePhase.PHASE1_CONFIDENT || phase === GamePhase.PHASE2_NERVOUS) {
+    if (
+      phase === GamePhase.PHASE1_CONFIDENT ||
+      phase === GamePhase.PHASE2_NERVOUS
+    ) {
       counters.push('SILENCE', 'DEFLECTION');
       if (status.alertLevel > 60) {
         counters.push('LAWYER_THREAT');
@@ -260,7 +291,7 @@ export class DamageCalculator {
           type: 'SILENCE',
           damage: 5,
           effect: '沈黙の圧力',
-          message: '容疑者は黙り込んで、重い沈黙が部屋を包んだ...'
+          message: '容疑者は黙り込んで、重い沈黙が部屋を包んだ...',
         };
 
       case 'DEFLECTION':
@@ -268,7 +299,7 @@ export class DamageCalculator {
           type: 'DEFLECTION',
           damage: 10,
           effect: '話題逸らし',
-          message: '容疑者は巧みに話を逸らし、あなたの追求をかわした！'
+          message: '容疑者は巧みに話を逸らし、あなたの追求をかわした！',
         };
 
       case 'LAWYER_THREAT':
@@ -276,7 +307,7 @@ export class DamageCalculator {
           type: 'LAWYER_THREAT',
           damage: 15,
           effect: '弁護士要求',
-          message: '「もう話しません！弁護士を呼んでください！」'
+          message: '「もう話しません！弁護士を呼んでください！」',
         };
 
       case 'BREAKDOWN':
@@ -284,7 +315,8 @@ export class DamageCalculator {
           type: 'BREAKDOWN',
           damage: 0,
           effect: '感情的崩壊',
-          message: '容疑者は泣き崩れた... しかし、何か重要なことを口走りそうだ...'
+          message:
+            '容疑者は泣き崩れた... しかし、何か重要なことを口走りそうだ...',
         };
 
       default:
@@ -292,7 +324,7 @@ export class DamageCalculator {
           type: 'SILENCE',
           damage: 5,
           effect: '沈黙',
-          message: '...'
+          message: '...',
         };
     }
   }
@@ -317,7 +349,11 @@ export class DamageCalculator {
   /**
    * 敗北条件チェック
    */
-  static checkDefeatCondition(status: SuspectStatus, turnNumber: number, maxTurns: number): boolean {
+  static checkDefeatCondition(
+    status: SuspectStatus,
+    turnNumber: number,
+    maxTurns: number
+  ): boolean {
     return turnNumber >= maxTurns || status.alertLevel >= 90;
   }
 }
